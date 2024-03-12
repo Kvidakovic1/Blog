@@ -1,0 +1,95 @@
+﻿@{
+    ViewData["Title"] = "Welcome";
+}
+@model List<BlogZavrsni.ViewModels.PostViewModel>
+
+<h3>Posts</h3>
+
+<form action="/Home/Index" method="get">
+<div class="form-group">
+    <label for="searchTerm">Search posts:</label>
+        <input type="text" id="searchTerm" name="searchTerm" class="form-control" />
+        <button type="submit" class="btn btn-primary">Serach</button>
+</div>    
+</form>
+
+@foreach(var post in Model)
+{
+    <div class="post">
+        @if (!string.IsNullOrEmpty(post.ImagePath))
+        {
+            <img src="/@post.ImagePath"/>    
+        }
+        <h2>@post.Title</h2>
+        <p>@Html.Raw(post.Content)</p>
+        <div class="tags">
+            @foreach(var tagId in post.TagIds)
+            {
+                var tag = (ViewBag.Tags as List<Tag>).FirstOrDefault(x => x.Id == tagId);
+                if (tag != null)
+                {
+                    <span class="chip">@tag.Name</span>   
+                }
+            }
+
+        </div>
+        
+        <div>
+            <h4>Komentari:</h4>
+            @foreach(var comment in post.Comments)
+            {
+                <p>@comment.Text</p>
+                
+            }
+            <div>
+                <form action="/Posts/AddComment" method="post">
+                    <input type="hidden" name="postId" value="@post.Id"/> 
+                    <div class="form-group">
+                        <label for="commentText">Dodaj komentar</label>
+                        <textarea id="commentText" name="commentText" class="form-control"></textarea>
+                        <button type="submit" class="btn btn-primary">Dodaj komentar</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+        @if (ViewBag.LikedPosts.Contains(post.Id) == false)
+        {
+            <a href="/Posts/LikePost?postId=@post.Id" class=" btn btn-dark">Like</a>
+        }
+        else
+        {
+            <p>Već ste lajkali ovu objavu</p>
+        }
+
+        <span>Ukopno lajkova: @post.Likes </span>
+          
+       
+    </div>    
+
+}
+
+<style>
+
+    .post {
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ab1c01;
+        background-color: #949392
+    }
+
+    .tags{
+        margin-bottom:10px;
+
+    }
+    .chip{
+        display:inline-block;
+        padding: 5px 10px;
+        margin-right:5px;
+        background-color: #fff;
+        border-radius: 20px;
+
+
+    }
+
+</style>
